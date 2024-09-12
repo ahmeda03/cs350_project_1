@@ -1,1 +1,0 @@
-I printed "sneaky little strng" in main.c. i know this is in kernel space because it is in main.c and is not the result of any user script or from a user command/input.
