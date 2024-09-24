@@ -7,10 +7,16 @@
    REMEMBER to disable the stub functions (by commenting the following macro) to 
    allow your implementation to work properly. */
 
-#define STUB_FUNCS
-#ifdef STUB_FUNCS
-void exit2(int status) {}
-#endif
+//#define STUB_FUNCS
+//#ifdef STUB_FUNCS
+/*void exit2(int status) {
+  printf(1, "EXIT-2\n");
+  if(argint(0, &status) < 0 ) {
+    return -1;
+  }
+  exit2();
+}
+#endif */
 
 
 /* IMPORTANT INSTRUCTION: the code below should not be changed. 
