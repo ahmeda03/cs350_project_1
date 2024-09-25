@@ -92,6 +92,7 @@ extern int sys_fork(void);
 extern int sys_fstat(void);
 extern int sys_getpid(void);
 extern int sys_shutdown(void);
+extern int sys_shutdown2(void);
 extern int sys_kill(void);
 extern int sys_link(void);
 extern int sys_mkdir(void);
@@ -129,6 +130,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_shutdown] sys_shutdown,
+[SYS_shutdown2] sys_shutdown2,
 [SYS_exit2]   sys_exit2,
 };
 

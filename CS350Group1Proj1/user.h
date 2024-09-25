@@ -24,6 +24,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int shutdown(void);
+int shutdown2(char*);
 int exit2(int status);
 
 // ulib.c
