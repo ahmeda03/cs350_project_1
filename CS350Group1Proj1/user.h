@@ -28,6 +28,7 @@ int shutdown2(char *);
 int exit2(int status);
 int uptime2(int);
 int getproc(int);
+int mkdir2(char*, char*);
 
 // ulib.c
 int stat(char *, struct stat *);

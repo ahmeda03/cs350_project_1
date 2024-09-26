@@ -17,11 +17,12 @@
 #define SYS_write 16
 #define SYS_mknod 17
 #define SYS_unlink 18
-#define SYS_link 19
-#define SYS_mkdir 20
-#define SYS_close 21
+#define SYS_link   19
+#define SYS_mkdir  20
+#define SYS_close  21
 #define SYS_shutdown 22
 #define SYS_exit2 23
 #define SYS_shutdown2 24
 #define SYS_uptime2 25
 #define SYS_getproc 26
+#define SYS_mkdir2 27
