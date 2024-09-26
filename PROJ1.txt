@@ -1,0 +1,23 @@
+My group members and I worked on this project by communicating through Discord while creating separate branches for each of our own system calls. 
+Thomas worked on shutdown2 which extends shutdown by allowing users to set a message before system shuts down. 
+Jenylee worked on exit2 where it takes an argument as an integer exit status and prints it before exiting. 
+Ahmed worked on mkdir2 which extends mkdir by allowing users to create 2 directories instead of 1 in the file system. 
+Tu worked on uptime2 which extends uptime by allowing users to see how long the system has been running in ticks, seconds, or minutes. 
+
+
+
+
+Custom syscall:
+sys_getproc
+
+Purpose: 
+To collect and return statistical data about the processes in the xv6 operating system. Users can retrieve a variety of metrics related to the state and PIDs of processes. Can help with monitoring system performance,
+debugging, etc. 
+
+Functionality: 
+The function first acquires a lock on the process table while executing and releases it when done. When locked in, it iterates over the process table (ptable) and counts the number of processes in different states (unused, zombies,
+etc). It also tracks the total number of processes and determines the minimum and maximum process IDs (PIDs) of active processes. Lastly, it will return the data the user want based on the argument "i".
+
+Usage:
+It gets provoked in getproc.c as follow: uint result = getproc(i);
+Users can call the syscall by typing in the shell: getproc i (ex. getproc 1, returns count of all processes)

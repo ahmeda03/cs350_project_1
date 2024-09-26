@@ -443,3 +443,27 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int
+sys_mkdir2(void)
+{
+  char *path;
+  struct inode *ip, *ip2;
+
+  begin_op();
+  
+  if(argstr(0, &path) < 0 || (ip = create(path, T_DIR, 0, 0)) == 0){
+    end_op();
+    return -1;
+  }
+
+  if(argstr(1, &path) < 0 || (ip2 = create(path, T_DIR, 0, 0)) == 0){
+    end_op();
+    return -1;
+  }
+
+  iunlockput(ip);
+  iunlockput(ip2);
+  end_op();
+  return 0;
+}
