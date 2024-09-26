@@ -6,68 +6,64 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+#include "spinlock.h"
 
-int
-sys_fork(void)
+int sys_fork(void)
 {
   return fork();
 }
 
-int
-sys_exit(void)
+int sys_exit(void)
 {
   exit();
-  return 0;  // not reached
+  return 0; // not reached
 }
 
-int
-sys_wait(void)
+int sys_wait(void)
 {
   return wait();
 }
 
-int
-sys_kill(void)
+int sys_kill(void)
 {
   int pid;
 
-  if(argint(0, &pid) < 0)
+  if (argint(0, &pid) < 0)
     return -1;
   return kill(pid);
 }
 
-int
-sys_getpid(void)
+int sys_getpid(void)
 {
   return myproc()->pid;
 }
 
-int
-sys_sbrk(void)
+int sys_sbrk(void)
 {
   int addr;
   int n;
 
-  if(argint(0, &n) < 0)
+  if (argint(0, &n) < 0)
     return -1;
   addr = myproc()->sz;
-  if(growproc(n) < 0)
+  if (growproc(n) < 0)
     return -1;
   return addr;
 }
 
-int
-sys_sleep(void)
+int sys_sleep(void)
 {
   int n;
   uint ticks0;
 
-  if(argint(0, &n) < 0)
+  if (argint(0, &n) < 0)
     return -1;
   acquire(&tickslock);
   ticks0 = ticks;
-  while(ticks - ticks0 < n){
-    if(myproc()->killed){
+  while (ticks - ticks0 < n)
+  {
+    if (myproc()->killed)
+    {
       release(&tickslock);
       return -1;
     }
@@ -79,8 +75,7 @@ sys_sleep(void)
 
 // return how many clock tick interrupts have occurred
 // since start.
-int
-sys_uptime(void)
+int sys_uptime(void)
 {
   uint xticks;
 
@@ -90,9 +85,133 @@ sys_uptime(void)
   return xticks;
 }
 
-int
-sys_shutdown(void) {
-  outw(0xB004, 0x0|0x2000);
-  outw(0x604, 0x0|0x2000);
+int sys_shutdown2(void)
+{
+  char *msg;
+  if (argstr(0, &msg) < 0)
+  {
+    return -1;
+  }
+  cprintf("%s\n", msg);
+  outw(0xB004, 0x0 | 0x2000);
+  outw(0x604, 0x0 | 0x2000);
   return 0;
+}
+
+int sys_shutdown(void)
+{
+  outw(0xB004, 0x0 | 0x2000);
+  outw(0x604, 0x0 | 0x2000);
+  return 0;
+}
+
+int sys_exit2(void)
+{
+  int status;
+  if (argint(0, &status) < 0)
+  {
+    return -1;
+  }
+  cprintf("Exiting status of %d\n", status);
+  exit();
+  return 0; // not reached
+}
+
+int sys_uptime2(void)
+{
+  int formatId;
+  char name[16];
+
+  if (argint(0, &formatId) < 0)
+    return -1;
+
+  uint xticks;
+  acquire(&tickslock);
+  xticks = ticks;
+  release(&tickslock);
+
+  switch (formatId)
+  {
+  case 1:
+    // 1 tick = 10 milliseconds
+    return xticks;
+    break;
+  case 2:
+    // 100 ticks = 1000ms (1sec)
+    return xticks / 100;
+    break;
+  case 3:
+    // 6000 ticks = 60 seconds (1min)
+    return xticks / 6000;
+  default:
+    return -1;
+  }
+}
+
+extern struct
+{
+  struct spinlock lock;
+  struct proc proc[NPROC];
+} ptable;
+
+int sys_getproc(void)
+{
+  int i;
+
+  if (argint(0, &i) < 0)
+    return -1;
+
+  struct proc *p;
+  int all = 0, unused = 0, embryo = 0, sleeping = 0, runnable = 0, running = 0, zombie = 0, maxPID = 0, minPID = 9999;
+
+  acquire(&ptable.lock);
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    all++;
+    if (p->state == UNUSED)
+      unused++;
+    else if (p->state == EMBRYO)
+      embryo++;
+    else if (p->state == SLEEPING)
+      sleeping++;
+    else if (p->state == RUNNABLE)
+      runnable++;
+    else if (p->state == RUNNING)
+      running++;
+    else if (p->state == ZOMBIE)
+      zombie++;
+
+    if (p->pid > maxPID)
+      maxPID = p->pid;
+
+    if (p->pid < minPID && p->pid > 0)
+      minPID = p->pid;
+  }
+  release(&ptable.lock);
+
+  switch (i)
+  {
+  case 1:
+    return all;
+  case 2:
+    return maxPID;
+  case 3:
+    return minPID;
+  case 4:
+    return unused;
+  case 5:
+    return embryo;
+  case 6:
+    return sleeping;
+  case 7:
+    return runnable;
+  case 8:
+    return running;
+  case 9:
+    return zombie;
+  default:
+    return -1;
+  }
+
+  return -1;
 }
